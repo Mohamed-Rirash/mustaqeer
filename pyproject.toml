@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "mustaqeer"
+version = "0.1.0"
+description = "app that motivates you to read quran and track your quran progress with ranking system"
+authors = ["Mohamed-Rirash <mohamedrirash12045@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["standard"], version = "^0.112.1"}
+uvicorn = "^0.30.6"
+alembic = "^1.13.2"
+ruff = "^0.6.1"
+aiosqlite = "^0.20.0"
+pydantic-settings = "^2.4.0"
+fastapi-mail = "^1.4.1"
+sqlalchemy = "^2.0.32"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
