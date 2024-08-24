@@ -6,3 +6,4 @@ class BookCreate(BaseModel):
 
     name: str
     author: str
+    publisher: str

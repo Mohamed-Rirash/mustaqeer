@@ -11,7 +11,7 @@ test_router =APIRouter(
 @test_router.post("/books/", )
 async def create_book(db: db_dependency, book:BookCreate):
     new_book = Book(**book.dict())
-
+    print(new_book)
     db.add(new_book)
     await db.commit()
     await db.refresh(new_book)

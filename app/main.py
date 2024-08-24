@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.config.database import sessionmanager
 from app.config.settings import settings
+from app.routes import users
 
 version = "0.0.1"
 
@@ -20,7 +21,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="mustaqeer",
-    desscription="app that motivates you to read quran and track your quran progress also has ranking system",
+    description="app that motivates you to read quran and track your quran progress also has ranking system",
     version=version,
     lifespan=lifespan,
     docs_url="/api/{version}/docs"
@@ -45,7 +46,9 @@ def read_root():
     return {"Hello": "World"}
 
 
-
 #TODO-1 TEST
 from app.routes.test import test_router
 app.include_router(test_router)
+app.include_router(users.user_router)
+app.include_router(users.guest_router)
+app.include_router(users.auth_router)
