@@ -6,6 +6,7 @@ from app.config.database import sessionmanager
 
 
 
+
 async def get_db() -> AsyncIterator[AsyncSession]:
     """
     This function returns a database session dependency.
@@ -31,4 +32,3 @@ async def get_db() -> AsyncIterator[AsyncSession]:
 
 db_dependency = Annotated[AsyncSession, Depends(get_db)]
 # cache_dependency = Annotated[AsyncSession, Depends(get_db)]
-# user_dependency = Annotated[AsyncSession, Depends(get_db)]

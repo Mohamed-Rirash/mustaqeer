@@ -15,6 +15,10 @@ aiosqlite = "^0.20.0"
 pydantic-settings = "^2.4.0"
 fastapi-mail = "^1.4.1"
 sqlalchemy = "^2.0.32"
+pathlib = "^1.0.1"
+passlib = "^1.7.4"
+resend = "^2.4.0"
+pyjwt = "^2.9.0"
 
 
 [build-system]
