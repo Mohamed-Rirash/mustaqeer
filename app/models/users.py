@@ -3,9 +3,10 @@ from sqlalchemy import func, ForeignKey
 from typing import TYPE_CHECKING
 from datetime import datetime
 from app.config.database import Base
+from app.models.episodes import Episode
 
-# if TYPE_CHECKING:
-#     from app.models.post_model import Post
+if TYPE_CHECKING:
+    from app.models.episodes import Episode
 
 class User(Base):
     __tablename__ = "users"
@@ -15,6 +16,9 @@ class User(Base):
     last_name: Mapped[str] = mapped_column(nullable=False)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
     password: Mapped[str] = mapped_column(nullable=False)
+    profile_image: Mapped[str] = mapped_column(nullable=True)
+    points: Mapped[int] = mapped_column(default=0)
+    no_of_khatmis: Mapped[int] = mapped_column(default=0)
     is_active: Mapped[bool] = mapped_column(default=False)
     verified_at: Mapped[datetime] = mapped_column(nullable=True,default=None)
     created_at: Mapped[datetime] = mapped_column(default=func.now())
@@ -23,6 +27,7 @@ class User(Base):
     is_superuser: Mapped[bool] = mapped_column(default=False)
 
     user_tokens: Mapped[list["UserToken"]] = relationship("UserToken", back_populates="user")
+    episodes: Mapped[list["Episode"]] = relationship("Episode", back_populates="user")
 
     def get_context_string(self, context: str):
         return f"{context}{self.password[-6:]}{self.updated_at.strftime('%m%d%Y%H%M%S')}".strip()

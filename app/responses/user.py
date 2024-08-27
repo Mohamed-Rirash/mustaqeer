@@ -8,6 +8,9 @@ class UserResponse(BaseResponse):
     id: int
     first_name: str
     email: EmailStr
+    profile_image: str
+    points: int
+    no_of_khatmis: int
     is_active: bool
     created_at: Union[str, None, datetime] = None
 

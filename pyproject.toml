@@ -19,6 +19,10 @@ pathlib = "^1.0.1"
 passlib = "^1.7.4"
 resend = "^2.4.0"
 pyjwt = "^2.9.0"
+fastapi-limiter = "^0.1.6"
+pytest = "^8.3.2"
+python-magic = "^0.4.27"
+boto3 = "^1.35.6"
 
 
 [build-system]
