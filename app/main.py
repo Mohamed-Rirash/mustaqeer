@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.config.database import sessionmanager
 from app.config.settings import settings
-from app.routes import users
+from app.routes import episodes, users
 
 import redis.asyncio as redis
 from fastapi_limiter import FastAPILimiter
@@ -54,28 +54,5 @@ async def index_get():
 app.include_router(users.user_router)
 app.include_router(users.guest_router)
 app.include_router(users.profile_router)
+app.include_router(episodes.episode_router)
 
-
-
-# Existing imports and code...
-
-# @app.get("/get-profile-image/{filename}")
-# async def get_profile_image(filename: str):
-#     try:
-#         # Create a BytesIO stream to hold the image data
-#         image_stream = io.BytesIO()
-
-#         # Retrieve the object from S3
-#         bucket.download_fileobj(Key=filename, Fileobj=image_stream)
-
-#         # Move the stream position to the beginning
-#         image_stream.seek(0)
-
-#         # Get the content type based on the file extension
-#         content_type = magic.from_file(filename, mime=True)
-
-#         return StreamingResponse(image_stream, media_type=content_type)
-#     except boto3.exceptions.S3UploadFailedError:
-#         raise HTTPException(status_code=404, detail="Image not found")
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail="Internal Server Error")

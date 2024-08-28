@@ -3,10 +3,9 @@ from sqlalchemy import func, ForeignKey
 from typing import TYPE_CHECKING
 from datetime import datetime
 from app.config.database import Base
-from app.models.episodes import Episode
 
 if TYPE_CHECKING:
-    from app.models.episodes import Episode
+    from app.models.episodes import Episode, Member
 
 class User(Base):
     __tablename__ = "users"
@@ -25,6 +24,7 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(default=func.now(), onupdate=func.now())
     is_firstlogin: Mapped[bool] = mapped_column(default=True)
     is_superuser: Mapped[bool] = mapped_column(default=False)
+    members: Mapped[list["Member"]] = relationship("Member", back_populates="user")
 
     user_tokens: Mapped[list["UserToken"]] = relationship("UserToken", back_populates="user")
     episodes: Mapped[list["Episode"]] = relationship("Episode", back_populates="user")

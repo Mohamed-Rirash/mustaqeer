@@ -7,3 +7,10 @@ class AddEpisodeRequest(BaseModel):
     description: str = Field(..., min_length=20 , max_length=150)
 
 
+class JoinEpisodeRequest(BaseModel):
+    episode_id: int
+
+class MemberRequest(BaseModel):
+    user_id: int
+    episode_id: int
+   
