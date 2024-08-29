@@ -1,4 +1,7 @@
 import logging
+from urllib.parse import urlparse
+import uuid
+import magic
 from sqlalchemy import select, bindparam, func
 from fastapi import HTTPException, status
 from app.config.security import (
@@ -18,6 +21,12 @@ from app.models.users import (
 from fastapi.responses import JSONResponse
 from app.config.security import hash_password
 from app.services.email import send_account_verification_email, send_password_reset_email
+from app.utils.profile import (
+    MB,
+    SUPPORTED_IMAGE_FORMATS,
+    delete_s3_image,
+    s3_upload
+)
 from app.utils.string import unique_string
 from sqlalchemy.orm import joinedload
 
@@ -32,11 +41,8 @@ from app.services.email import send_account_activation_confirmation_email
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta, datetime
 from app.config.settings import settings
-# Set up a basic logger
 
 
-# Create a logger instance
- # __name__ will be the module name
 
 
 async def create_user(data, background_tasks, db):
@@ -218,6 +224,59 @@ async def activate_user_account(data, db, background_tasks):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred during account activation. Please try again later.",
         )
+async def upload_profile(profile_image, db, user):
+
+    if not profile_image:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No profile image provided")
+
+    # Read the image content
+    content = await profile_image.read()
+    size = len(content)
+
+    if size > 1 * MB:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Profile image is too large")
+
+    file_type = magic.from_buffer(content, mime=True)
+    if file_type not in SUPPORTED_IMAGE_FORMATS:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported image format")
+
+    filename = f"{uuid.uuid4()}.{SUPPORTED_IMAGE_FORMATS[file_type]}"
+
+    user_id = user.id
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid user token")
+
+    # Fetch the user from the database
+    user = await db.execute(select(User).where(User.id == user_id))
+    user = user.scalar_one_or_none()
+
+    if user:
+        # Check if there is an existing profile image
+        if user.profile_image:
+            # Extract the filename from the existing URL
+            existing_url = user.profile_image
+            parsed_url = urlparse(existing_url)
+            existing_filename = parsed_url.path.lstrip('/')  # Remove leading '/'
+
+            # Delete the existing image from S3
+            await delete_s3_image(existing_filename)
+
+        # Upload the new image to S3
+        await s3_upload(content=content, filename=filename, content_type=file_type)
+
+        # Construct the new image URL
+        image_url = f"https://{settings.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/{filename}"
+
+        # Update the profile image URL in the database
+        user.profile_image = image_url
+        await db.commit()  # Commit the transaction to save the changes
+        await db.flush()
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    return {"message": "Profile image uploaded successfully", "image_url": image_url}
+
+
 async def get_login_token(data, db, response):
     user = await load_user(data.username, db)
     if not user:
@@ -372,6 +431,10 @@ async def reset_user_password(data, db):
 async def fetch_user_details(user_id, db):
     async with db.begin():
         query = select(User).where(User.id == user_id)
-        user_result = await db.execute(query)
-        user_result = user_result.scalars().first()
-        return user_result
+        result = await db.execute(query)
+        user = result.scalar_one_or_none()
+
+        if user is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+        return user

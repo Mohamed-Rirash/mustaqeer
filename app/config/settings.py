@@ -35,6 +35,13 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_MINUTES: int
     # App Secret Key
     SECRET_KEY: str
+    REDIS_URI: str
+
+    # AWS
+    AWS_ACCESS_KEY_ID: str
+    AWS_SECRET_ACCESS_KEY: str
+    # AWS_REGION_NAME: str
+    AWS_S3_BUCKET_NAME: str
 
     class Config:
         """Settings configuration."""
