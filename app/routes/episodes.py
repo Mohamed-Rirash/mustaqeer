@@ -1,8 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
-from sqlalchemy import select
 from app.config.dependencies import db_dependency
 from app.config.security import user_dependency
-from app.models.episodes import Episode
 from app.services.episodes import create_episode, exit_episode_service, get_all_episodes_service, get_episode_by_id_service, get_episode_by_juz_service, get_episode_members_service, join_episode_service
 from app.schemas.episodes import AddEpisodeRequest, JoinEpisodeRequest
 from app.responses.episodes import AddEpisodeResponse

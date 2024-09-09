@@ -6,7 +6,7 @@ from app.config.database import Base
 
 if TYPE_CHECKING:
     from app.models.episodes import Episode, Member
-
+    from app.models.my_progress_model import Progress
 class User(Base):
     __tablename__ = "users"
 
@@ -28,6 +28,7 @@ class User(Base):
 
     user_tokens: Mapped[list["UserToken"]] = relationship("UserToken", back_populates="user")
     episodes: Mapped[list["Episode"]] = relationship("Episode", back_populates="user")
+    reading_progresses: Mapped[list["Progress"]] = relationship("Progress", back_populates="user")
 
     def get_context_string(self, context: str):
         return f"{context}{self.password[-6:]}{self.updated_at.strftime('%m%d%Y%H%M%S')}".strip()

@@ -18,7 +18,7 @@ At Mustaqeer, we strive to make Quran reading an integral part of your daily lif
 
 ## 💡 Get Involved
 
-We welcome contributions from the community! Whether you're a developer, designer, or have valuable insights to share, your input can help make Mustaqeer even better. Check out our [Contributing Guidelines](CONTRIBUTING.md) to get started.
+We welcome contributions from the community! Whether you're a developer, designer, or have valuable insights to share, your input can help make Mustaqeer even better. Check out our [Contributing Guidelines](CONTRIBUTING.md no) to get started.
 
 ## 🚀 Start Your Journey
 

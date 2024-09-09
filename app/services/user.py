@@ -1,4 +1,4 @@
-import logging
+
 from urllib.parse import urlparse
 import uuid
 import magic
@@ -60,6 +60,8 @@ async def create_user(data, background_tasks, db):
 
     If any of the above steps fail, the transaction is rolled back and an HTTPException is raised.
     """
+
+
     try:
         # Start a transaction
         async with db.begin():
@@ -112,7 +114,7 @@ async def create_user(data, background_tasks, db):
                 user=new_user, background_tasks=background_tasks
             )
 
-        except Exception:
+        except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="User created, but failed to send verification email. Please contact support.",
@@ -125,7 +127,7 @@ async def create_user(data, background_tasks, db):
             },
         )
 
-    except IntegrityError:
+    except IntegrityError as e:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -136,7 +138,7 @@ async def create_user(data, background_tasks, db):
         await db.rollback()
         raise http_exc
 
-    except Exception:
+    except Exception as e:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -173,7 +175,6 @@ async def activate_user_account(data, db, background_tasks):
             try:
                 token_valid = verify_password(user_token, data.token)
             except Exception:
-                logging.exception("Token verification failed")
                 token_valid = False
 
             if not token_valid:
@@ -197,7 +198,6 @@ async def activate_user_account(data, db, background_tasks):
         try:
             await send_account_activation_confirmation_email(user_result, background_tasks)
         except Exception:
-            logging.exception("Failed to send confirmation email")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="User activated, but failed to send confirmation email. Please contact support.",
@@ -207,7 +207,6 @@ async def activate_user_account(data, db, background_tasks):
 
     except IntegrityError:
         # Rollback is not needed here as async with db.begin() will handle it
-        logging.exception("Database error during user activation")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to activate user account due to a database error. Please contact support.",
@@ -219,7 +218,6 @@ async def activate_user_account(data, db, background_tasks):
 
     except Exception as exc:
         # Rollback is not needed here as async with db.begin() will handle it
-        logging.exception("An unexpected error occurred during account activation")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred during account activation. Please try again later.",
@@ -279,9 +277,11 @@ async def upload_profile(profile_image, db, user):
 
 async def get_login_token(data, db, response):
     user = await load_user(data.username, db)
+
     if not user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="This email is not associated with any registered account")
+
     if not verify_password(data.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid credentials")

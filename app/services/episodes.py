@@ -1,13 +1,9 @@
 #TODO-1: CREATE EPISODE
 from fastapi import HTTPException,status
-from sqlalchemy import delete, func, select,bindparam, Integer
+from sqlalchemy import delete, func, select
 
 from app.models.episodes import Episode, Member
-from app.utils.episode import check_episode_condition
 
-from sqlalchemy import select, func
-from fastapi import HTTPException, status
-from sqlalchemy.orm import joinedload
 
 async def create_episode(data, db, user):
     if not user:

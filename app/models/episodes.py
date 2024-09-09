@@ -3,6 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, func
 from datetime import datetime
 from app.config.database import Base
+from app.models.my_progress_model import Progress
 
 if TYPE_CHECKING:
     from app.models.users import User
@@ -20,7 +21,8 @@ class Episode(Base):
 
     user: Mapped["User"] = relationship("User", back_populates="episodes")
     members: Mapped[List["Member"]] = relationship("Member", back_populates="episode")
-
+    reading_progresses: Mapped[List["Progress"]] = relationship("Progress", back_populates="episode")
+    
 class Member(Base):
     __tablename__ = "members"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

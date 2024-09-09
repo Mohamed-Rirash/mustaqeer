@@ -7,3 +7,4 @@ __pycache__
 dev.db
 tests/
 .venv/
+.ruff_cache/

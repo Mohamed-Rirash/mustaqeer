@@ -11,7 +11,7 @@ from sqlalchemy.orm import joinedload
 from app.config import settings
 from app.models.users import UserToken
 from fastapi.security import OAuth2PasswordBearer
-
+from app.models.users import User
 from app.config.dependencies import db_dependency
 
 SPECIAL_CHARACTERS = ["@", "#", "$", "%", "=", ":", "?", ".", "/", "|", "~", ">"]
@@ -60,8 +60,10 @@ def generate_token(payload: dict, secret_key: str, algorithm: str, expire: timed
     expire_datetime = datetime.utcnow() + expire
     payload.update({"exp": expire_datetime})
     return jwt.encode(payload, secret_key, algorithm=algorithm)
+
+
 async def load_user(email: str, db):
-    from app.models.users import User
+
     try:
         query = select(User).where(User.email == bindparam("email"))
         user = await db.execute(
@@ -69,6 +71,7 @@ async def load_user(email: str, db):
             {"email": email},
         )
         user = user.scalars().first()
+        print(f"user: {user}")
     except Exception as user_exec:
         logging.info(f"User Not Found, Email: {email}")
         user = None
